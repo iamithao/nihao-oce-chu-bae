@@ -173,8 +173,9 @@ a .node{box-shadow:0 5px 0 rgba(0,0,0,.25)}
 .hzbox{display:grid;grid-template-columns:minmax(0,230px) minmax(0,1fr);gap:16px;align-items:center;text-align:left;padding:14px;border-radius:20px;background:var(--glass);border:1px solid var(--line);width:100%}
 .hzv{width:min(220px,100%);aspect-ratio:1;margin:0 auto;border:1px solid var(--line);border-radius:16px;background:var(--glass-b);color:var(--fg)} .hz-svg{width:100%;height:100%;display:block}
 .radbox{display:grid;gap:10px} .radbox .muted{font-size:12px;display:block}
-.wgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start} .wl .hzbox{grid-template-columns:1fr;text-align:center}
-@media (max-width:760px){.wgrid{grid-template-columns:1fr}}
+.wgrid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:12px;align-items:start}
+.pad{container-type:inline-size}
+.wl .hzbox{padding:8px;gap:8px} .wl .hzbox .btn{padding:5px 9px;font-size:12px;min-width:0} .wl .hzbox .row{flex-wrap:wrap!important} .wl .radbox{font-size:13px;gap:6px} .wl .radbox .gp{margin:0 3px} .wl .chips .chip{padding:4px 10px;font-size:14px} .wl .hzbox{grid-template-columns:1fr;text-align:center}
 @media (max-width:560px){.hzbox{grid-template-columns:1fr}}
 .sy button.on{background:linear-gradient(135deg,var(--indigo),var(--coral));color:#fff;border-color:transparent}
 @media (max-width:700px){.speedbox.half{width:100%;min-width:0}}
@@ -1812,10 +1813,10 @@ function write(){
   view.innerHTML=`<h2>Tập viết</h2>${deckChips(S.deck,write,false).replace('Tất cả','')}
   <section class="glass"><div class="row" style="justify-content:center;margin-bottom:14px"><div style="text-align:center"><b style="font-size:22px">${esc(w.p)}</b> · ${esc(w.vi)}</div><button class="spk" type="button" data-say="${esc(w.h)}" aria-label="Nghe">${SPK}</button></div>
   <div class="wgrid"><div class="wl" id="wl"></div><div class="wr"><div class="pad" id="pad"><svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"><path d="M0 0L100 100M100 0L0 100M50 0V100M0 50H100" stroke="var(--line)" stroke-width=".5" stroke-dasharray="2 2" fill="none"/></svg>
-  <div class="ghost" id="ghost" style="font-size:${fs}px;opacity:${WR.show?.16:0}">${esc(w.h)}</div><canvas id="cv"></canvas></div>
+  <div class="ghost" id="ghost" style="font-size:${(fs/360*100).toFixed(1)}cqw;opacity:${WR.show?.16:0}">${esc(w.h)}</div><canvas id="cv"></canvas></div>
   <div class="row" style="justify-content:center;margin-top:16px"><button class="btn ghost" type="button" id="clr">Xóa viết lại</button><button class="btn ghost" type="button" id="gh">${WR.show?'Ẩn chữ mẫu':'Hiện chữ mẫu'}</button><button class="btn" type="button" id="nxt">Chữ khác</button></div>
   <p class="muted" style="text-align:center;margin-bottom:0">Dùng ngón tay hoặc chuột viết đè lên chữ mờ. Thứ tự nét chính: trái trước phải, trên trước dưới.</p></div></div></section>`;
-  hzCard($('#wl'),w.h);
+  hzCard($('#wl'),w.h,{compact:1});
   bindDeck(()=>{WR=null;write()});
   const cv=$('#cv'),pad=$('#pad');const r=pad.getBoundingClientRect(),dpr=devicePixelRatio||1;cv.width=r.width*dpr;cv.height=r.height*dpr;
   const x=cv.getContext('2d');x.scale(dpr,dpr);x.lineWidth=Math.max(7,r.width/28);x.lineCap='round';x.lineJoin='round';
