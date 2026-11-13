@@ -1360,7 +1360,37 @@ function startUnitSpeak(l){
   const steps=[...ws.slice(0,3).map(w=>({k:'shadow',w})),...ws.slice(3,6).map(w=>({k:'shadow',w:{id:'s:'+w.id,deck:w.deck,h:clean(w.ex),p:clean(w.exp),vi:w.exvi}}))];
   L={l,steps,i:0,hearts:5,right:0,tot:0,quit:0};renderLesson();
 }
+/* lưu và tiếp tục bài đang học dở */
+let WMAP=null;
+const wmap=()=>WMAP||(WMAP=new Map(WORDS.map(w=>[w.id,w])));
+function saveProg(){
+  if(!L||!L.l)return;
+  try{
+    const steps=JSON.parse(JSON.stringify(L.steps,(k,v)=>v&&typeof v==='object'&&!Array.isArray(v)&&v.id&&v.deck&&v.h&&wmap().get(v.id)===v?{__w:v.id}:v));
+    S.prog=S.prog||{};S.prog[L.l.id]={i:L.i,hearts:L.hearts,right:L.right,tot:L.tot,steps};
+    save();
+  }catch(e){}
+}
+const clearProg=id=>{if(S.prog&&S.prog[id]){delete S.prog[id];save()}};
+function resumeLesson(l,p){
+  const steps=JSON.parse(JSON.stringify(p.steps),(k,v)=>v&&v.__w?wmap().get(v.__w):v);
+  L={l,steps,i:p.i,hearts:p.hearts,right:p.right,tot:p.tot,quit:0};renderLesson();
+}
 function startLesson(l){
+  const p=S.prog&&S.prog[l.id];
+  if(p&&p.steps&&p.i>0&&p.i<p.steps.length){
+    closeSheet();
+    const sh=document.createElement('div');sh.className='sheet';sh.id='sheet';
+    sh.innerHTML='<div role="dialog" aria-label="Tiếp tục học"><div class="eyebrow">Bài đang học dở</div><h2 style="margin-bottom:6px">'+esc(lname(l))+'</h2><p class="muted" style="margin-top:0">Bạn đã học đến bước '+(p.i+1)+'/'+p.steps.length+'. Muốn học tiếp hay học lại từ đầu?</p><div class="row" style="margin-top:16px"><button class="btn" type="button" id="rsc">Tiếp tục học</button><button class="btn ghost" type="button" id="rsn">Học lại từ đầu</button></div></div>';
+    document.body.appendChild(sh);
+    sh.onclick=e=>{if(e.target===sh)closeSheet()};
+    $('#rsc').onclick=()=>{closeSheet();resumeLesson(l,p)};
+    $('#rsn').onclick=()=>{closeSheet();clearProg(l.id);beginLesson(l)};
+    return;
+  }
+  beginLesson(l);
+}
+function beginLesson(l){
   if(l.type==='gram')return startGram(l);
   if(l.type==='utest')return startUnitTest(l);
   if(l.type==='uspeak')return startUnitSpeak(l);
@@ -1381,7 +1411,8 @@ function renderLesson(){
   const s=L.steps[L.i];if(!s)return finishLesson();
   o.scrollTop=0;
   o.innerHTML=`<div class="lwrap"><div class="lt"><button class="spk" id="lx" type="button" aria-label="Thoát bài học">${ico('x',20)}</button><div class="bar" style="flex:1"><i style="width:${L.i/L.steps.length*100}%"></i></div><span class="pill" id="hp">♥ ${L.hearts}</span></div><div class="lbody" id="lb"></div><div id="fb"></div></div>`;
-  $('#lx').onclick=()=>{if(L.quit){closeLesson()}else{L.quit=1;$('#lx').textContent='Thoát?';$('#lx').style.width='auto';$('#lx').style.padding='0 14px';$('#lx').style.background='var(--coral)';$('#lx').style.color='#fff';$('#lx').style.borderColor='transparent';$('#lx').style.fontWeight='700';toast('Bấm lần nữa để thoát, tiến độ bài này sẽ không lưu.')}};
+  $('#lx').onclick=()=>{saveProg();closeLesson();toast('Đã lưu tiến trình, mở lại bài để học tiếp.')};
+  saveProg();
   STEP[s.k](s);
 }
 function closeLesson(){document.getElementById('lesson')?.remove();L=null;if(document.getElementById('hub')){drawHub()}else document.documentElement.style.overflow='';route()}
@@ -1500,6 +1531,7 @@ const STEP={
 function confetti(){const c=document.createElement('div');c.className='cf';c.setAttribute('aria-hidden','true');c.innerHTML=[...Array(16)].map((_,i)=>`<span style="left:${Math.random()*100}%;animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*.6}s;color:var(--${['indigo','coral','jade','sun'][i%4]})">${'学中文房爱好家'[i%7]}</span>`).join('');document.body.appendChild(c);setTimeout(()=>c.remove(),5500)}
 function finishLesson(){
   const l=L.l,stars=L.hearts>=5?3:L.hearts>=3?2:1,xp=(15+L.right*2+stars*5)*(l.type==='test'?2:1),acc=L.tot?Math.round(L.right/L.tot*100):100;
+  clearProg(l.id);
   const first=!done(l);S.path[l.id]=Math.max(S.path[l.id]||0,stars);
   if(l.type==='lesson')l.words.forEach(w=>{if(!S.cards[w.id])S.cards[w.id]={box:1,due:Date.now()+DAY}});
   dd().lessons++;addXP(xp);save();beep(1);confetti();
@@ -1510,7 +1542,7 @@ function finishLesson(){
   $('#nx').onclick=()=>{closeLesson();location.hash='path'};
 }
 function failLesson(){
-  const l=L.l;beep(0);
+  const l=L.l;beep(0);clearProg(l.id);
   document.getElementById('lesson').innerHTML=`<div class="lwrap"><div class="lbody"><div class="eyebrow">Hết tim</div><h1 style="font-size:32px">Bài này hơi khó, thử lại nhé</h1><p class="muted">Không sao cả. Xem lại các từ rồi làm lại, lần sau sẽ dễ hơn.</p></div><div class="fb"><button class="btn ghost" id="qt" type="button">Thoát</button><button class="btn" id="rt" type="button">Làm lại bài</button></div></div>`;
   $('#qt').onclick=closeLesson;$('#rt').onclick=()=>startLesson(l);
 }
