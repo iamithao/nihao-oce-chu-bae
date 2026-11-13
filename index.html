@@ -161,6 +161,8 @@ a .node{box-shadow:0 5px 0 rgba(0,0,0,.25)}
 .speedbox .row{justify-content:center} .speedbox .btn{padding:9px 16px}
 .speedbox.mini{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff;padding:8px 12px;gap:4px} .speedbox.mini .top,.speedbox.mini .top b,.speedbox.mini .ticks{color:#fff} .speedbox.mini .btn{background:#fff;color:#2b1d8a;box-shadow:none;padding:6px 14px;font-size:13px} .speedbox.mini .btn.ghost{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.5)} .speedbox.mini .spd{accent-color:#fff}
 .back .speedbox{margin-top:4px}
+#fbBtn{position:fixed;right:16px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:85;width:52px;height:52px;border-radius:50%;border:0;background:linear-gradient(135deg,#6366f1,#f43f5e);color:#fff;box-shadow:var(--shadow);display:grid;place-items:center}
+@media (min-width:861px){#fbBtn{bottom:24px;right:24px}}
 .hzbox{display:grid;grid-template-columns:minmax(0,230px) minmax(0,1fr);gap:16px;align-items:center;text-align:left;padding:14px;border-radius:20px;background:var(--glass);border:1px solid var(--line);width:100%}
 .hzv{width:min(220px,100%);aspect-ratio:1;margin:0 auto;border:1px solid var(--line);border-radius:16px;background:var(--glass-b);color:var(--fg)} .hz-svg{width:100%;height:100%;display:block}
 .radbox{display:grid;gap:10px} .radbox .muted{font-size:12px;display:block}
@@ -836,7 +838,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
 const SPK='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
-const ICO={};const ICOP={"vocab":"<path d=\"m5 8 6 6\"/><path d=\"m4 14 6-6 2-3\"/><path d=\"M2 5h12\"/><path d=\"M7 2h1\"/><path d=\"m22 22-5-10-5 10\"/><path d=\"M14 18h6\"/>","list":"<path d=\"M8 6h13M8 12h13M8 18h13\"/><path d=\"M3 6h.01M3 12h.01M3 18h.01\"/>","check":"<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"m9 14 2 2 4-4\"/>","mic":"<rect x=\"9\" y=\"2\" width=\"6\" height=\"12\" rx=\"3\"/><path d=\"M5 11a7 7 0 0 0 14 0M12 18v4\"/>","pen":"<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z\"/>","book":"<path d=\"M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2Z\"/><path d=\"M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7Z\"/>","sound":"<path d=\"M11 5 6 9H2v6h4l5 4V5Z\"/><path d=\"M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13\"/>","lock":"<rect x=\"4\" y=\"11\" width=\"16\" height=\"10\" rx=\"2\"/><path d=\"M8 11V7a4 4 0 0 1 8 0v4\"/>","x":"<path d=\"M18 6 6 18M6 6l12 12\"/>","back":"<path d=\"M19 12H5\"/><path d=\"m12 19-7-7 7-7\"/>"};
+const ICO={};const ICOP={"chat":"<path d=\"M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 3 11.5 8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5Z\"/>","vocab":"<path d=\"m5 8 6 6\"/><path d=\"m4 14 6-6 2-3\"/><path d=\"M2 5h12\"/><path d=\"M7 2h1\"/><path d=\"m22 22-5-10-5 10\"/><path d=\"M14 18h6\"/>","list":"<path d=\"M8 6h13M8 12h13M8 18h13\"/><path d=\"M3 6h.01M3 12h.01M3 18h.01\"/>","check":"<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"m9 14 2 2 4-4\"/>","mic":"<rect x=\"9\" y=\"2\" width=\"6\" height=\"12\" rx=\"3\"/><path d=\"M5 11a7 7 0 0 0 14 0M12 18v4\"/>","pen":"<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z\"/>","book":"<path d=\"M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2Z\"/><path d=\"M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7Z\"/>","sound":"<path d=\"M11 5 6 9H2v6h4l5 4V5Z\"/><path d=\"M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13\"/>","lock":"<rect x=\"4\" y=\"11\" width=\"16\" height=\"10\" rx=\"2\"/><path d=\"M8 11V7a4 4 0 0 1 8 0v4\"/>","x":"<path d=\"M18 6 6 18M6 6l12 12\"/>","back":"<path d=\"M19 12H5\"/><path d=\"m12 19-7-7 7-7\"/>"};
 const ico=(n,sz=24)=>'<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICOP[n]+'</svg>';
 const GRADM=['linear-gradient(135deg,#6366f1,#a78bfa)','linear-gradient(135deg,#0ea5e9,#22d3ee)','linear-gradient(135deg,#f43f5e,#fb923c)','linear-gradient(135deg,#10b981,#34d399)'];
 const HP='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M3 14h3a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2v-4Zm18 0h-3a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h1a2 2 0 0 0 2-2v-4Z"/></svg>';
@@ -1122,7 +1124,7 @@ function dd(){const k=dayKey();if(!S.dd||S.dd.k!==k)S.dd={k,lessons:0,cards:0,sp
 /* ---------- Tài khoản: lưu và đồng bộ tiến độ qua tài khoản claude.ai ---------- */
 const ACC={me:null,ref:null,state:'none',msg:'',busy:false,dirty:false,t:0};
 const lastWord=n=>(String(n||'').trim().split(/\s+/).pop())||'';
-const greetName=()=>S.nick||(ACC.me&&!ACC.me.isOwner?(lastWord(ACC.me.name)||'bạn'):'iamithao');
+const greetName=()=>WEB?(webName()||'bạn iêu'):S.nick||(ACC.me&&!ACC.me.isOwner?(lastWord(ACC.me.name)||'bạn'):'iamithao');
 function accPush(now){
   if(!ACC.ref)return;
   clearTimeout(ACC.t);
@@ -1168,7 +1170,7 @@ async function accInit(){
 function accDraw(){
   const gn=document.getElementById('gname');if(gn)gn.textContent=greetName();
   const el=document.getElementById('acc');if(!el)return;
-  if(WEB){el.innerHTML=`<div class="row" style="flex-wrap:nowrap;gap:14px"><span class="hic" style="background:${GRADM[1]};width:46px;height:46px;border-radius:50%">${ico('lock',22)}</span><div style="min-width:0"><b>Bản dùng thử trên web</b><div class="muted" style="font-size:14px">Đăng nhập tài khoản và đồng bộ chưa có ở bản này. Tiến độ học được lưu ngay trên trình duyệt của bạn (không chuyển sang máy khác được). Micro luyện nói chưa dùng được, giọng đọc dùng giọng có sẵn trong máy.</div></div></div>`;return}
+  if(WEB){el.innerHTML=`<div class="row" style="flex-wrap:nowrap;gap:14px"><span class="hic" style="background:${GRADM[1]};width:46px;height:46px;border-radius:50%">${ico('lock',22)}</span><div style="min-width:0"><b>Bản dùng thử trên web</b><div class="muted" style="font-size:14px">Đăng nhập tài khoản và đồng bộ chưa có ở bản này. Tiến độ học được lưu ngay trên trình duyệt của bạn (không chuyển sang máy khác được). Micro luyện nói chưa dùng được, giọng đọc dùng giọng có sẵn trong máy.</div></div><button class="btn ghost" type="button" id="chn">${webName()?'Đổi tên ('+esc(webName())+')':'Đặt tên'}</button></div>`;const cb=document.getElementById('chn');if(cb)cb.onclick=nameAsk;return}
   if(!ACC.me||!ACC.me.id){
     el.innerHTML=`<div class="row" style="flex-wrap:nowrap;gap:14px"><span class="hic" style="background:${GRADM[0]};width:46px;height:46px;border-radius:50%">${ico('lock',22)}</span><div style="min-width:0"><b>Chưa đăng nhập</b><div class="muted" style="font-size:14px">Mở trang bằng tài khoản claude.ai (đăng nhập Google hoặc email của claude.ai) để lưu tiến độ và đồng bộ điện thoại với máy tính. Hiện tiến độ chỉ lưu trên máy này.</div></div></div>`;return}
   const st=ACC.state==='sync'?'Đang đồng bộ…':ACC.state==='nodb'?'Thiết bị này chưa bật được đồng bộ.':(ACC.msg||'');
@@ -1333,6 +1335,86 @@ function drawHub(){
   <div class="glass" style="padding:4px 16px">${rows}</div></div>`;
   $('#hx').onclick=closeHub;
   o.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{const i=+b.dataset.l,l=LESSONS[i];l.type==='lesson'?openSheet(l,i):startLesson(l)});
+}
+
+/* ---------- Bản web: hỏi tên người dùng thử + nút góp ý (góp ý chảy về bảng tính của chủ trang) ---------- */
+const FORM_URL='https://docs.google.com/forms/d/e/1FAIpQLSdzd_hqM72LRj5SMVafet0wYtpmtsH-XCRRNM8Wc4gBtfCDwQ/formResponse';
+const FE={name:'entry.1378522527',msg:'entry.703970066',where:'entry.53046636',dev:'entry.126488871'};
+const NK='thao-web-name',NKA='thao-web-asked';
+const webName=()=>{try{return localStorage.getItem(NK)||''}catch(e){return ''}};
+const normT=s=>String(s).toLowerCase().replace(/đ/g,'d').normalize('NFD').replace(/[̀-ͯ]/g,'');
+const collapse=s=>s.replace(/(.)\1+/g,'$1');
+const BAD_SUB=['fuck','shit','bitch','asshole','pussy','cunt','nigga','nigger','slut','whore','bastard','porn','dumamay','duma','dume','memay','dumay','ditme','ditcon','concho','occho','khonnan','sucvat','thangcho','dongu','thangngu','conngu','lonma','caclon','cailon','buoicac','vailon','vaicalon','dmm','dcm','vcl','clgt','dkm','cmm','dumeme','ditmemay','metmay'].map(collapse);
+const BAD_TOK=['dit','lon','cac','buoi','deo','dm','vl','cc','cl','dj','cave','dyt'];
+function badText(t){
+  const n=collapse(normT(t).replace(/[0@]/g,'o').replace(/[1!|]/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/[5$]/g,'s').replace(/7/g,'t'));
+  const toks=n.split(/[^a-z]+/).filter(Boolean),compact=toks.join('');
+  return BAD_SUB.some(w=>compact.includes(w))||toks.some(x=>BAD_TOK.includes(x));
+}
+function nameCheck(v){
+  v=String(v||'').trim();
+  if(v.length<2||v.length>20)return 'Tên cần từ 2 đến 20 ký tự.';
+  if(!/^[\p{L}\p{N} ]+$/u.test(v))return 'Tên chỉ gồm chữ, số và dấu cách thôi nhé.';
+  const c=normT(v).replace(/[^a-z]/g,'');
+  if(c.includes('iamithao'))return 'Tên này chưa dùng được, bạn chọn tên khác nhé.';
+  if(/admin|quantri|claude|anthropic/.test(c))return 'Tên này chưa dùng được, bạn chọn tên khác nhé.';
+  if(badText(v))return 'Tên này chưa phù hợp, bạn chọn tên khác nhé.';
+  return '';
+}
+function nameAsk(){
+  closeSheet();
+  const sh=document.createElement('div');sh.className='sheet';sh.id='sheet';
+  sh.innerHTML='<div role="dialog" aria-label="Tên của bạn"><div class="eyebrow">Làm quen nhé</div><h2 style="margin-bottom:6px">Bạn tên gì?</h2><p class="muted" style="margin-top:0">Tên hiển thị trong lời chào và gửi kèm góp ý của bạn. Không dùng từ tục tĩu hoặc tên người khác.</p><input class="search" id="wname" type="text" maxlength="20" placeholder="Ví dụ: Lan, Minh Anh…" value="'+esc(webName())+'" aria-label="Tên của bạn"><div id="werr" class="muted" style="color:var(--coral);min-height:22px" role="alert"></div><div class="row" style="margin-top:10px"><button class="btn" type="button" id="wsave">Lưu tên</button><button class="btn ghost" type="button" id="wskip">Để sau (gọi là bạn iêu)</button></div></div>';
+  document.body.appendChild(sh);
+  const done=()=>{try{localStorage.setItem(NKA,'1')}catch(e){}closeSheet();accDraw();const g=document.getElementById('gname');if(g)g.textContent=greetName()};
+  $('#wskip').onclick=done;
+  $('#wsave').onclick=()=>{const v=$('#wname').value.trim(),m=nameCheck(v);if(m){$('#werr').textContent=m;return}try{localStorage.setItem(NK,v)}catch(e){}done();toast('Rất vui được làm quen, '+v+'!')};
+  $('#wname').onkeydown=e=>{if(e.key==='Enter')$('#wsave').click()};
+  setTimeout(()=>{const i=$('#wname');i&&i.focus()},50);
+}
+function fbWhere(){
+  const p=['trang '+(location.hash||'#home')];
+  try{
+    if(L&&L.l){const s=L.steps[L.i];p.push('bài: '+lname(L.l)+' · bước '+(L.i+1)+'/'+L.steps.length+(s?' ('+s.k+(s.w&&s.w.h?': '+s.w.h:'')+')':''))}
+    else if(HUB){const u=SECTIONS[HUB.si].units[HUB.ui];p.push('trang bài: '+u.label+' · '+u.zh)}
+  }catch(e){}
+  return p.join(' | ');
+}
+let FB_LAST=0;
+function fbOpen(){
+  closeSheet();
+  const sh=document.createElement('div');sh.className='sheet';sh.id='sheet';
+  sh.innerHTML='<div role="dialog" aria-label="Góp ý"><div class="eyebrow">Góp ý</div><h2 style="margin-bottom:6px">Bạn thấy chỗ nào cần sửa?</h2><p class="muted" style="margin-top:0">Chữ sai, nút khó bấm, giao diện chưa đẹp, thiếu bài… cứ nói nhé. Em tự gửi kèm trang và bài bạn đang xem để dễ tìm lỗi.</p><input class="search" id="fbn" type="text" maxlength="20" placeholder="Tên của bạn (có thể bỏ trống)" value="'+esc(webName())+'" aria-label="Tên của bạn"><textarea class="search" id="fbm" rows="5" maxlength="1000" placeholder="Góp ý của bạn…" aria-label="Nội dung góp ý" style="resize:vertical"></textarea><input type="text" id="fbh" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px" aria-hidden="true"><div id="fbe" class="muted" style="color:var(--coral);min-height:20px" role="alert"></div><div class="muted" style="font-size:12px;margin-bottom:10px">Góp ý gửi kèm: tên bạn nhập, trang đang xem và loại thiết bị. Không gửi email hay mật khẩu.</div><div class="row"><button class="btn" type="button" id="fbs">Gửi góp ý</button><button class="btn ghost" type="button" id="fbc">Đóng</button></div></div>';
+  document.body.appendChild(sh);sh.onclick=e=>{if(e.target===sh)closeSheet()};
+  $('#fbc').onclick=closeSheet;
+  setTimeout(()=>{const m=$('#fbm');m&&m.focus()},50);
+  $('#fbs').onclick=async()=>{
+    const msg=$('#fbm').value.trim(),nm=$('#fbn').value.trim();
+    if(msg.length<3){$('#fbe').textContent='Bạn viết thêm một chút nhé.';return}
+    if(nm){const m=nameCheck(nm);if(m){$('#fbe').textContent=m;return}}
+    if($('#fbh').value)return;
+    if(Date.now()-FB_LAST<15000){$('#fbe').textContent='Bạn chờ vài giây rồi gửi tiếp nhé.';return}
+    FB_LAST=Date.now();
+    $('#fbs').disabled=true;$('#fbs').textContent='Đang gửi…';
+    const body=new URLSearchParams();
+    body.set(FE.name,nm||webName()||'(không tên)');
+    body.set(FE.msg,(badText(msg)?'[CẦN XEM LẠI] ':'')+msg);
+    body.set(FE.where,fbWhere());
+    body.set(FE.dev,(innerWidth+'x'+innerHeight)+' · '+(navigator.userAgent||'').slice(0,160));
+    try{
+      await fetch(FORM_URL,{method:'POST',mode:'no-cors',body});
+      closeSheet();toast('Cảm ơn bạn! Góp ý đã được gửi.');
+    }catch(e){
+      $('#fbs').disabled=false;$('#fbs').textContent='Gửi góp ý';$('#fbe').textContent='Chưa gửi được, bạn kiểm tra mạng rồi thử lại nhé.';FB_LAST=0;
+    }
+  };
+}
+function fbInit(){
+  if(!WEB||document.getElementById('fbBtn'))return;
+  const b=document.createElement('button');b.id='fbBtn';b.type='button';b.setAttribute('aria-label','Góp ý');b.title='Góp ý';
+  b.innerHTML=ico('chat',24);b.onclick=fbOpen;document.body.appendChild(b);
+  let asked=false;try{asked=!!localStorage.getItem(NKA)||!!webName()}catch(e){}
+  if(!asked)setTimeout(nameAsk,700);
 }
 
 /* ---------- Trình phát bài học ---------- */
@@ -1797,6 +1879,7 @@ document.addEventListener('keydown',e=>{
 });
 addEventListener('hashchange',route);route();
 accInit();
+fbInit();
 </script>
 
 </body></html>
