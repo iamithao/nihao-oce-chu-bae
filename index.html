@@ -868,7 +868,8 @@ const WEB=!(window.claude&&window.claude.use);
 const curVoice=()=>WEB&&!(S.voice||'').startsWith('local')?'local-f':(S.voice||'buttery');
 const hasLocal=()=>{try{return 'speechSynthesis' in window&&speechSynthesis.getVoices().some(v=>/^zh|cmn/i.test(v.lang))}catch(e){return false}};
 const avail=()=>VOICES.filter(v=>WEB?v[0].startsWith('local'):(!v[0].startsWith('local')||hasLocal()));
-try{speechSynthesis.onvoiceschanged=()=>{if(document.querySelector('[data-vc]')&&typeof home==='function'&&!document.getElementById('lesson'))home()}}catch(e){}
+try{speechSynthesis.onvoiceschanged=()=>{const vi=document.getElementById('vinfo');if(vi)vi.textContent=vinfo();if(document.querySelector('[data-vc]')&&typeof home==='function'&&!document.getElementById('lesson'))home()}}catch(e){}
+const vinfo=()=>{const v=zhVoices();return v.length?'Máy này có '+v.length+' giọng tiếng Trung: '+v.slice(0,4).map(x=>x.name).join(', ')+(v.length>4?'…':'')+'.':'Máy này chưa báo giọng tiếng Trung nào. Em vẫn thử đọc bằng giọng mặc định.'};
 const voiceName=v=>(VOICES.find(x=>x[0]===v)||VOICES[0])[1];
 const realRate=v=>v>=1?v:.7+(v-.5)*.6;
 function speak(text,rate=1,lines=null){
@@ -902,14 +903,21 @@ function speedBox(k,say,o={}){
 const spLab=v=>v<.95?'Chậm':v<1.05?'Vừa':'Nhanh';
 document.addEventListener('input',e=>{const t=e.target;if(!t.classList||!t.classList.contains('spd'))return;const box=t.closest('.speedbox'),k=box.dataset.k,v=+t.value;S.sp[k]=v;save();
   document.querySelectorAll('.speedbox[data-k="'+k+'"]').forEach(b=>{const r=b.querySelector('.spd');if(r!==t)r.value=v;b.querySelector('.sv').textContent=spLab(v)+' · '+v.toFixed(1)+'x'})});
+let VWARN=0;
+const zhVoices=()=>{try{return speechSynthesis.getVoices().filter(v=>/^zh|cmn/i.test(v.lang))}catch(e){return []}};
 function speakLocal(text,rate=1,lines=null,V='local-f'){
-  if(!('speechSynthesis' in window)){toast('Trình duyệt này chưa hỗ trợ phát âm. '+uname()+' thử mở bằng Chrome hoặc Edge nhé.');return}
-  const vs=speechSynthesis.getVoices().filter(v=>/^zh|cmn/i.test(v.lang));
-  const fem=/Huihui|Xiaoxiao|Xiaoyi|Yaoyao|Hanhan|Tingting|Meijia|Sinji|Female|Google/i,mal=/Kangkang|Yunxi|Yunyang|Yunjian|Male/i;
-  const v=(V==='local-m'?vs.find(x=>mal.test(x.name)):vs.find(x=>fem.test(x.name)))||vs.find(x=>/zh[-_]CN/i.test(x.lang))||vs[0];
-  if(!v){toast(WEB?'Máy này chưa có giọng đọc tiếng Trung. Bạn thử mở bằng Chrome hoặc Edge, hoặc cài thêm giọng tiếng Trung nhé.':'Máy này chưa có giọng đọc tiếng Trung có sẵn. Thảo chọn một giọng Claude nhé.');return}
-  speechSynthesis.cancel();
-  (lines&&lines.length>1?lines:[text]).forEach(t=>{const u=new SpeechSynthesisUtterance(t);u.lang='zh-CN';u.rate=Math.max(.5,Math.min(1.5,rate));u.voice=v;u.onerror=ev=>{if(ev&&ev.error&&ev.error!=='canceled'&&ev.error!=='interrupted')toast('Giọng máy không phát được ('+ev.error+'). '+(WEB?'Bạn thử trình duyệt khác nhé.':'Thảo thử giọng Claude nhé.'))};speechSynthesis.speak(u)});
+  if(!('speechSynthesis' in window)){toast('Trình duyệt này chưa hỗ trợ phát âm. '+uname()+' thử mở bằng Chrome hoặc Safari mới nhé.');return}
+  const vs=zhVoices();
+  const fem=/Huihui|Xiaoxiao|Xiaoyi|Yaoyao|Hanhan|Tingting|Ting-Ting|Meijia|Mei-Jia|Sinji|Sin-Ji|Lili|Female|Google/i,mal=/Kangkang|Yunxi|Yunyang|Yunjian|Male/i;
+  const v=(V==='local-m'?vs.find(x=>mal.test(x.name)):vs.find(x=>fem.test(x.name)))||vs.find(x=>/zh[-_]CN/i.test(x.lang))||vs[0]||null;
+  /* chưa thấy giọng nào thì vẫn cứ đọc bằng giọng mặc định của máy theo mã tiếng Trung, đừng bỏ cuộc */
+  if(!v&&!VWARN){VWARN=1;toast('Chưa thấy giọng tiếng Trung trong máy, em thử đọc bằng giọng mặc định. Nếu vẫn im, bạn vào Cài đặt > Giọng nói của máy để thêm tiếng Trung nhé.')}
+  try{if(speechSynthesis.speaking||speechSynthesis.pending)speechSynthesis.cancel();if(speechSynthesis.paused)speechSynthesis.resume()}catch(e){}
+  (lines&&lines.length>1?lines:[text]).forEach(t=>{
+    const u=new SpeechSynthesisUtterance(t);u.lang=v?v.lang:'zh-CN';u.rate=Math.max(.5,Math.min(1.5,rate));u.volume=1;if(v)u.voice=v;
+    u.onerror=ev=>{if(ev&&ev.error&&ev.error!=='canceled'&&ev.error!=='interrupted')toast('Giọng máy không phát được ('+ev.error+'). '+(WEB?'Bạn kiểm tra âm lượng, bật tiếng rồi thử lại nhé.':'Thảo thử giọng Claude nhé.'))};
+    speechSynthesis.speak(u);
+  });
 }
 if('speechSynthesis' in window)speechSynthesis.getVoices();
 document.addEventListener('click',e=>{const vb=e.target.closest('[data-voice]');if(vb){e.stopPropagation();const AV=avail(),i=AV.findIndex(x=>x[0]===curVoice());S.voice=AV[(i+1)%AV.length][0];save();document.querySelectorAll('[data-voice]').forEach(x=>{x.textContent='Giọng: '+voiceName(S.voice)});const box=vb.closest('.speedbox'),sb=box&&box.querySelector('[data-say]');if(sb)speakMode(sb.dataset.say,'n','',sb.dataset.kind||'w','',+box.querySelector('.spd').value);return}
@@ -1224,7 +1232,7 @@ function home(){
   </div>
   <section class="glass"><div class="row" style="justify-content:space-between"><div><h3>Kế hoạch của ${esc(uname())}</h3><p class="muted" style="margin:6px 0 0;max-width:60ch">Mục tiêu ${GOALTXT[S.goal]}, ${S.mins} phút mỗi ngày. Còn ${remain} bài trong lộ trình, nếu học đều thì khoảng ${days} ngày nữa là xong.</p></div><button class="btn ghost" type="button" id="re">Đổi kế hoạch</button></div></section>
   <section class="glass" style="margin-top:16px"><h3>Âm thanh đúng / sai</h3><p class="muted" style="margin:6px 0 12px">Bấm để nghe thử và chọn. Mỗi lần bấm nghe tiếng đúng rồi tiếng sai.</p><div class="chips" style="margin:0">${Object.keys(SFX).map(k=>`<button type="button" class="chip ${(S.sfx||'chuong')===k?'on':''}" data-sfx="${k}">${SFX[k].name}</button>`).join('')}</div></section>
-  <section class="glass" style="margin-top:16px"><h3>Giọng đọc</h3><p class="muted" style="margin:6px 0 12px">Bấm từng giọng để nghe thử rồi chọn giọng hợp với ${esc(uname())}. ${WEB?'Bản web dùng giọng có sẵn trong máy của bạn, nên giọng phụ thuộc vào thiết bị.':'Bốn giọng Claude có thể hơi khác ngữ điệu mỗi lần đọc.'} ${hasLocal()?'Hai giọng “máy” là giọng có sẵn trong máy, đọc giống hệt nhau mỗi lần.':'Máy này chưa có giọng đọc tiếng Trung có sẵn nên chưa hiện giọng “máy” nữ và nam.'}</p><div class="chips" style="margin:0">${avail().map(v=>`<button type="button" class="chip ${curVoice()===v[0]?'on':''}" data-vc="${v[0]}">${v[1]}</button>`).join('')}</div></section>`;
+  <section class="glass" style="margin-top:16px"><h3>Giọng đọc</h3><p class="muted" style="margin:6px 0 12px">Bấm từng giọng để nghe thử rồi chọn giọng hợp với ${esc(uname())}. ${WEB?'Bản web dùng giọng có sẵn trong máy của bạn, nên giọng phụ thuộc vào thiết bị.':'Bốn giọng Claude có thể hơi khác ngữ điệu mỗi lần đọc.'} ${hasLocal()?'Hai giọng “máy” là giọng có sẵn trong máy, đọc giống hệt nhau mỗi lần.':'Máy này chưa có giọng đọc tiếng Trung có sẵn nên chưa hiện giọng “máy” nữ và nam.'}</p>${WEB?`<div class="muted" id="vinfo" style="font-size:13px;margin-bottom:10px">${esc(vinfo())}</div>`:''}<div class="chips" style="margin:0">${avail().map(v=>`<button type="button" class="chip ${curVoice()===v[0]?'on':''}" data-vc="${v[0]}">${v[1]}</button>`).join('')}</div></section>`;
   const c=$('#cont');if(c)c.onclick=()=>openSheet(cl,ci);
   $('#re').onclick=()=>{S.setup=0;save();route()};
   view.querySelectorAll('[data-sfx]').forEach(b=>b.onclick=()=>{S.sfx=b.dataset.sfx;save();beep(1);setTimeout(()=>beep(0),900);home()});
@@ -1891,6 +1899,7 @@ document.addEventListener('keydown',e=>{
     const b=document.getElementById('nx')||(e.key==='Enter'?(document.getElementById('chk')||document.getElementById('rnx')||document.getElementById('rt')):null);
     if(b){e.preventDefault();b.click()}}
 });
+try{if('speechSynthesis' in window)speechSynthesis.getVoices()}catch(e){}
 addEventListener('hashchange',route);route();
 accInit();
 fbInit();
